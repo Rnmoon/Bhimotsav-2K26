@@ -49,7 +49,7 @@ export async function identifyUser(formData: FormData) {
     throw new Error('Failed to create user profile')
   }
 
-  redirect('/dashboard')
+  redirect('/events/games')
 }
 
 import { cache } from 'react'
