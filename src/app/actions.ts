@@ -88,7 +88,7 @@ export async function logout() {
 
 import { revalidatePath } from 'next/cache'
 
-export async function registerEvent(eventId: string, details: { phoneNumber: string, teamName?: string, hostelName?: string, teamMembers?: Array<{name: string, isCaptain?: boolean}> }) {
+export async function registerEvent(eventId: string, details: { phoneNumber: string, teamName?: string, hostelName?: string, teamMembers?: Array<{ name: string, isCaptain?: boolean }> }) {
   const user = await getCurrentUser()
   if (!user) throw new Error('Not authenticated')
 
@@ -101,16 +101,16 @@ export async function registerEvent(eventId: string, details: { phoneNumber: str
         teamName: details.teamName || null,
         hostelName: details.hostelName || null,
         teamMembers: details.teamMembers ? {
-           create: details.teamMembers
+          create: details.teamMembers
         } : undefined
       }
     })
-    
+
     // Invalidate the cache for user's dashboard and my-events so the UI updates
     revalidatePath('/dashboard')
     revalidatePath('/my-events')
     revalidatePath(`/events/${eventId}`)
-    
+
     return { success: true }
   } catch (error: any) {
     console.error('Failed to register:', error?.message || error)
@@ -124,7 +124,7 @@ export async function unregisterEvent(registrationId: string) {
 
   try {
     // Ensure the registration belongs to user
-    const reg = await prisma.registration.findUnique({ where: { id: registrationId }})
+    const reg = await prisma.registration.findUnique({ where: { id: registrationId } })
     if (reg?.userId !== user.id) throw new Error('Unauthorized')
 
     await prisma.registration.delete({
