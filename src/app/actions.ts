@@ -29,12 +29,8 @@ export async function identifyUser(formData: FormData) {
           user_token: token
         }
       })
-    } else {
-      user = await prisma.user.update({
-        where: { phoneNumber },
-        data: { user_token: token }
-      })
     }
+    // If user exists, we DON'T update the token anymore. We reuse the existing one.
 
     // Await cookies before setting, next 15+ async cookies
     const cookieStore = await cookies()
@@ -44,12 +40,14 @@ export async function identifyUser(formData: FormData) {
       maxAge: 60 * 60 * 24 * 365, // 1 year
       path: '/'
     })
+
+    return { success: true, user_token: user.user_token }
   } catch (error) {
     console.error('Error identifying user:', error)
-    throw new Error('Failed to create user profile')
+    return { error: 'Failed to create user profile' }
   }
 
-  redirect('/events/games')
+  // redirect('/events/games') // Moved to client side or handled after showing token
 }
 
 import { cache } from 'react'
